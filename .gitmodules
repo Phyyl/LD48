@@ -1,0 +1,3 @@
+[submodule "Vildmark"]
+	path = Vildmark
+	url = git@github.com:phyyl/Vildmark
