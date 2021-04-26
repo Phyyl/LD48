@@ -1,4 +1,5 @@
 ﻿using System;
+using Vildmark;
 
 namespace LD48
 {
@@ -6,7 +7,7 @@ namespace LD48
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            Game.Instance.Run();
         }
     }
 }
