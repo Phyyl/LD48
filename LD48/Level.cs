@@ -16,26 +16,29 @@ namespace LD48
 {
     public class Level
     {
-        private const float platformDistance = 300;
+        private const float platformDistance = 150;
         private const float maxPlatformWidth = 400;
-        private const float minPlatformWidth = 200;
+        private const float minPlatformWidth = 100;
+        private const float platformHeight = 5;
 
         private readonly Random random = new();
         private readonly List<Entity> entities = new();
         private readonly PhysicsSimulation simulation = new();
+        private PlatformEntity leftWall;
+        private PlatformEntity rightWall;
 
         public IEnumerable<Entity> Entities => entities.ToArray();
-        public float CameraSpeed = 150;
+        public float CameraSpeed = 100;
         public float CameraOffset { get; private set; }
 
         public Level()
         {
             CameraOffset = -Game.Instance.Window.Height;
 
-            AddEntity(new PlatformEntity(new(0, -1000), new(25, 100000)));
-            AddEntity(new PlatformEntity(new(Game.Instance.Window.Width - 25, -1000), new(25, 100000)));
-
             GeneratePlatforms();
+
+            leftWall.Bounce = 0.5f;
+            rightWall.Bounce = 0.5f;
         }
 
         public void AddEntity(Entity entity)
@@ -74,19 +77,20 @@ namespace LD48
 
         private void GeneratePlatforms()
         {
-            AddEntity(new PlatformEntity(new(0, 0), new(400, 25)));
+            AddEntity(leftWall = new PlatformEntity(new(0, -1000), new(25, 100000)));
+            AddEntity(rightWall = new PlatformEntity(new(Game.Instance.Window.Width - 25, -1000), new(25, 100000)));
+            AddEntity(new PlatformEntity(new(0, 0), new(400, platformHeight)));
 
             for (int i = 1; i < 1000; i++)
             {
                 float width = (float)random.NextDouble() * (maxPlatformWidth - minPlatformWidth) + minPlatformWidth;
-                float height = 25;
 
                 float x = (float)random.NextDouble() * (Game.Instance.Window.Width - width);
                 float y = i * platformDistance;
 
-                AddEntity(new PlatformEntity(new(x, y), new(width, height))
+                AddEntity(new PlatformEntity(new(x, y), new(width, platformHeight))
                 {
-                    Bounce = (float)random.NextDouble() / 4
+                    Bounce = (float)random.NextDouble() / 2
                 });
             }
         }

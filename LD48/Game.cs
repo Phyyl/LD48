@@ -39,7 +39,7 @@ namespace LD48
             renderContext = RenderContext2D.Create();
             level = new();
 
-            level.AddEntity(player = new PlayerEntity(startPosition, new(50, 50)));
+            level.AddEntity(player = new PlayerEntity(startPosition, new(20, 20)));
         }
 
         public override void Resize(int width, int height)

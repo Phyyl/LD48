@@ -11,7 +11,7 @@ namespace LD48
 {
     public class PhysicsSimulation
     {
-        public float Gravity = 1000;
+        public float Gravity = 1500;
 
         private readonly List<Entity> entities = new();
 
