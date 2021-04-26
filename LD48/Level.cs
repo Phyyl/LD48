@@ -1,4 +1,5 @@
 ﻿using LD48;
+using OpenTK.Graphics.ES20;
 using OpenTK.Graphics.OpenGL;
 using OpenTK.Mathematics;
 using System;
@@ -15,22 +16,26 @@ namespace LD48
 {
     public class Level
     {
-        private const float platformFriction = 0.1f;
+        private const float platformDistance = 300;
+        private const float maxPlatformWidth = 400;
+        private const float minPlatformWidth = 200;
 
+        private readonly Random random = new();
         private readonly List<Entity> entities = new();
-
         private readonly PhysicsSimulation simulation = new();
 
         public IEnumerable<Entity> Entities => entities.ToArray();
-
-        public float CameraSpeed { get; private set; } = 50;
-
+        public float CameraSpeed = 150;
         public float CameraOffset { get; private set; }
 
         public Level()
         {
-            AddEntity(new PlatformEntity(new(0, 0), new(25, 100000)));
-            AddEntity(new PlatformEntity(new(Game.Instance.Window.Width - 25, 0), new(25, 100000)));
+            CameraOffset = -Game.Instance.Window.Height;
+
+            AddEntity(new PlatformEntity(new(0, -1000), new(25, 100000)));
+            AddEntity(new PlatformEntity(new(Game.Instance.Window.Width - 25, -1000), new(25, 100000)));
+
+            GeneratePlatforms();
         }
 
         public void AddEntity(Entity entity)
@@ -64,6 +69,25 @@ namespace LD48
             foreach (var entity in entities)
             {
                 entity.Render(renderContext);
+            }
+        }
+
+        private void GeneratePlatforms()
+        {
+            AddEntity(new PlatformEntity(new(0, 0), new(400, 25)));
+
+            for (int i = 1; i < 1000; i++)
+            {
+                float width = (float)random.NextDouble() * (maxPlatformWidth - minPlatformWidth) + minPlatformWidth;
+                float height = 25;
+
+                float x = (float)random.NextDouble() * (Game.Instance.Window.Width - width);
+                float y = i * platformDistance;
+
+                AddEntity(new PlatformEntity(new(x, y), new(width, height))
+                {
+                    Bounce = (float)random.NextDouble() / 4
+                });
             }
         }
     }

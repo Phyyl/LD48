@@ -20,7 +20,7 @@ namespace LD48
     {
         private const float bounceAdjustSpeed = 0.1f;
 
-        private static readonly Vector2 startPosition = new(100, 100);
+        private static readonly Vector2 startPosition = new(100, -100);
 
         private RenderContext2D renderContext;
         private Level level;

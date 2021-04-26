@@ -15,6 +15,7 @@ namespace LD48
         {
             IsKinematic = false;
             IsGravityAffected = false;
+            Friction = 0.75f;
         }
 
         public override void Update(float delta)

@@ -14,7 +14,7 @@ namespace LD48
     public class PlayerEntity : Entity
     {
         public float InputForce = 500;
-        public float JumpForce => 500;
+        public float JumpForce = 200;
 
         private IKeyboard keyboard;
 
