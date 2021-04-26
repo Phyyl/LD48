@@ -27,6 +27,12 @@ namespace LD48
 
         public float CameraOffset { get; private set; }
 
+        public Level()
+        {
+            AddEntity(new PlatformEntity(new(0, 0), new(25, 100000)));
+            AddEntity(new PlatformEntity(new(Game.Instance.Window.Width - 25, 0), new(25, 100000)));
+        }
+
         public void AddEntity(Entity entity)
         {
             entity.Level = this;
