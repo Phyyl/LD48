@@ -17,11 +17,15 @@ namespace LD48
     {
         private const float platformFriction = 0.1f;
 
-        private List<Entity> entities = new();
+        private readonly List<Entity> entities = new();
 
         public IEnumerable<Entity> Entities => entities.ToArray();
 
         public float Gravity => 200;
+
+        public float CameraSpeed { get; private set; } = 50;
+
+        public float CameraOffset { get; private set; }
 
         public void AddEntity(Entity entity)
         {
@@ -45,6 +49,8 @@ namespace LD48
             {
                 UpdatePhysics(entity, delta);
             }
+
+            CameraOffset += CameraSpeed * delta;
         }
 
         public void Render(RenderContext2D renderContext)

@@ -12,6 +12,7 @@ using Vildmark;
 using Vildmark.Graphics.Rendering;
 using Vildmark.Maths;
 using Vildmark.Maths.Physics;
+using Vildmark.Windowing;
 
 namespace LD48
 {
@@ -25,6 +26,13 @@ namespace LD48
         private Level level;
         private PlayerEntity player;
         private DragInfo drag;
+
+        protected override void InitializeWindowSettings(WindowSettings settings)
+        {
+            settings.Border = OpenTK.Windowing.Common.WindowBorder.Fixed;
+            settings.Width = 1280;
+            settings.Height = 720;
+        }
 
         public override void Load()
         {
@@ -42,6 +50,8 @@ namespace LD48
         public override void Update(float delta)
         {
             level.Update(delta);
+
+            renderContext.Camera.Transform.Y = level.CameraOffset;
 
             if (Mouse.IsMousePressed(MouseButton.Left))
             {
@@ -63,23 +73,17 @@ namespace LD48
 
             if (Mouse.IsMousePressed(MouseButton.Right))
             {
-                foreach (var entity in level.Entities)
+                foreach (var entity in GetEntitiesAtScreenPosition(Mouse.Position))
                 {
-                    if (entity.CollisionBox.Contains(Mouse.Position) && entity is not PlayerEntity)
-                    {
-                        level.RemoveEntity(entity);
-                    }
+                    level.RemoveEntity(entity);
                 }
             }
 
             if (Mouse.Wheel.Y != 0)
             {
-                foreach (var entity in level.Entities)
+                foreach (var entity in GetEntitiesAtScreenPosition(Mouse.Position))
                 {
-                    if (entity.CollisionBox.Contains(Mouse.Position) && entity is not PlayerEntity)
-                    {
-                        entity.Bounce = MathHelper.Clamp(entity.Bounce + Mouse.Wheel.Y * bounceAdjustSpeed, 0, 1);
-                    }
+                    entity.Bounce = MathHelper.Clamp(entity.Bounce + Mouse.Wheel.Y * bounceAdjustSpeed, 0, 1);
                 }
             }
 
@@ -116,14 +120,27 @@ namespace LD48
             renderContext.End();
         }
 
+        private IEnumerable<Entity> GetEntitiesAtScreenPosition(Vector2 position)
+        {
+            foreach (var entity in level.Entities)
+            {
+                if (entity.CollisionBox.Contains(position + CameraOffset) && entity is not PlayerEntity)
+                {
+                    yield return entity;
+                }
+            }
+        }
+
         private AABB2D GetDragAABB(DragInfo drag)
         {
             Vector2 min = MathsHelper.Min(drag.Start, drag.End);
             Vector2 max = MathsHelper.Max(drag.Start, drag.End);
             Vector2 size = max - min;
 
-            return new AABB2D(min, size);
+            return new AABB2D(min + CameraOffset, size);
         }
+
+        private Vector2 CameraOffset => renderContext.Camera.Transform.Position.Xy;
 
         private record DragInfo(Vector2 Start, Vector2 End);
     }
