@@ -53,13 +53,16 @@ namespace LD48
                 for (int i = 0; i < 2 && movement.Length > 0 && (i == 0 || previousCollisions.Count > 0); i++)
                 {
                     Vector2 currentMovement = movement;
-                    float friction = previousCollisions.Count > 0 ? previousCollisions.Average(c => c.Other.Friction) : 0;
-                    float inverseFriction = 1 - friction * delta;
 
                     EntityCollision[] closestCollisions = GetClosestCollisions(entity, movement);
 
                     if (closestCollisions?.Length > 0)
                     {
+                        if (closestCollisions.Any(c => c.Other.CollisionBox.Intersects(entity.CollisionBox.Offset(c.Movement))))
+                        {
+
+                        }
+
                         EntityCollision entityCollision = closestCollisions[0];
 
                         currentMovement = entityCollision.Movement;
@@ -72,15 +75,14 @@ namespace LD48
                         previousCollisions.AddRange(closestCollisions);
                     }
 
-                    entity.Position += currentMovement * inverseFriction;
-                    entity.Velocity *= inverseFriction;
+                    entity.Position += currentMovement;
                 }
 
                 entity.IsOnGround = previousCollisions.Any(c => c.Face == AABBFace.Top);
             }
             else
             {
-                entity.Position += entity.Velocity * delta;
+                entity.Position += entity.Velocity;
             }
 
             EntityCollision ExecuteCollision(Vector2 movement, Entity other)
@@ -123,21 +125,17 @@ namespace LD48
                 return;
             }
 
-            float bounce = collisions.Average(c => c.Other.Bounce);
+            //float bounce = collisions.Average(c => c.Other.Bounce);
 
             switch (collision.Face)
             {
                 case AABBFace.Left:
-                    entity.Velocity.X *= -bounce;
-                    break;
                 case AABBFace.Right:
-                    entity.Velocity.X *= -bounce;
+                    entity.Velocity.X = 0;
                     break;
                 case AABBFace.Bottom:
-                    entity.Velocity.Y *= -bounce;
-                    break;
                 case AABBFace.Top:
-                    entity.Velocity.Y *= -bounce;
+                    entity.Velocity.Y = 0;
                     break;
             }
         }

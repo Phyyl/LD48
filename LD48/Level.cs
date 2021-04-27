@@ -19,26 +19,33 @@ namespace LD48
         private const float platformDistance = 150;
         private const float maxPlatformWidth = 400;
         private const float minPlatformWidth = 100;
-        private const float platformHeight = 5;
+        private const float powerupSize = 50;
 
         private readonly Random random = new();
         private readonly List<Entity> entities = new();
         private readonly PhysicsSimulation simulation = new();
-        private PlatformEntity leftWall;
-        private PlatformEntity rightWall;
+        private WallEntity leftWall;
+        private WallEntity rightWall;
 
         public IEnumerable<Entity> Entities => entities.ToArray();
         public float CameraSpeed = 100;
-        public float CameraOffset { get; private set; }
+        public float CameraOffset;
 
         public Level()
         {
-            CameraOffset = -Game.Instance.Window.Height;
+            ResetCameraOffset();
 
-            GeneratePlatforms();
+            GenerateEntities();
 
             leftWall.Bounce = 0.5f;
+            leftWall.ZIndex = 1;
             rightWall.Bounce = 0.5f;
+            rightWall.ZIndex = 1;
+        }
+
+        public void ResetCameraOffset()
+        {
+            CameraOffset = -Game.Instance.Window.Height;
         }
 
         public void AddEntity(Entity entity)
@@ -69,29 +76,30 @@ namespace LD48
 
         public void Render(RenderContext2D renderContext)
         {
-            foreach (var entity in entities)
+            foreach (var entity in entities.OrderBy(e => e.ZIndex))
             {
                 entity.Render(renderContext);
             }
         }
 
-        private void GeneratePlatforms()
+        private void GenerateEntities()
         {
-            AddEntity(leftWall = new PlatformEntity(new(0, -1000), new(25, 100000)));
-            AddEntity(rightWall = new PlatformEntity(new(Game.Instance.Window.Width - 25, -1000), new(25, 100000)));
-            AddEntity(new PlatformEntity(new(0, 0), new(400, platformHeight)));
+            AddEntity(leftWall = new WallEntity(0));
+            AddEntity(rightWall = new WallEntity(Game.Instance.Window.Width - Textures.Wall.Width * Game.PixelScale));
+            AddEntity(new PlatformEntity(new(0, 0), 400));
 
             for (int i = 1; i < 1000; i++)
             {
                 float width = (float)random.NextDouble() * (maxPlatformWidth - minPlatformWidth) + minPlatformWidth;
-
-                float x = (float)random.NextDouble() * (Game.Instance.Window.Width - width);
+                float x = (float)random.NextDouble() * (Game.Instance.Window.Width - width - Textures.Wall.Width * 2 * Game.PixelScale) + Textures.Wall.Width * Game.PixelScale;
                 float y = i * platformDistance;
 
-                AddEntity(new PlatformEntity(new(x, y), new(width, platformHeight))
+                AddEntity(new PlatformEntity(new(x, y), width)
                 {
                     Bounce = (float)random.NextDouble() / 2
                 });
+
+                AddEntity(new PowerupEntity(new(x + width / 2 - powerupSize / 2, y - powerupSize * 2), new(powerupSize)));
             }
         }
     }

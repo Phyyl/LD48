@@ -21,8 +21,8 @@ namespace LD48
         public bool IsCollidable = true;
         public Color4 Color = Color4.White;
         public float Bounce;
-        public float Friction = 0.5f;
         public bool IsOnGround;
+        public float ZIndex;
 
         public AABB2D CollisionBox => new(Position, Size);
 

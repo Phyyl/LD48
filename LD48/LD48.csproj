@@ -1,20 +1,32 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <OutputType>Exe</OutputType>
-    <TargetFramework>net5.0</TargetFramework>
-  </PropertyGroup>
+	<Import Project="..\Vildmark\Vildmark.Graphics.Fonts\Vildmark.Graphics.Fonts.props" />
 
-  <ItemGroup>
-    <ProjectReference Include="..\Vildmark\Vildmark.Audio\Vildmark.Audio.csproj" />
-    <ProjectReference Include="..\Vildmark\Vildmark.Core\Vildmark.Core.csproj" />
-    <ProjectReference Include="..\Vildmark\Vildmark.Graphics.Fonts\Vildmark.Graphics.Fonts.csproj" />
-    <ProjectReference Include="..\Vildmark\Vildmark.Graphics\Vildmark.Graphics.csproj" />
-    <ProjectReference Include="..\Vildmark\Vildmark.Maths\Vildmark.Maths.csproj" />
-    <ProjectReference Include="..\Vildmark\Vildmark.Qubicle\Vildmark.Qubicle.csproj" />
-    <ProjectReference Include="..\Vildmark\Vildmark.Tests\Vildmark.Tests.csproj" />
-    <ProjectReference Include="..\Vildmark\Vildmark.Windowing\Vildmark.Windowing.csproj" />
-    <ProjectReference Include="..\Vildmark\Vildmark\Vildmark.csproj" />
-  </ItemGroup>
+	<PropertyGroup>
+		<OutputType>Exe</OutputType>
+		<TargetFramework>net5.0</TargetFramework>
+	</PropertyGroup>
+
+	<ItemGroup>
+	  <EmbeddedResource Include="tiles.png" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Font Include="8bit.ttf" Size="50" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\Vildmark\Vildmark.Audio\Vildmark.Audio.csproj" />
+		<ProjectReference Include="..\Vildmark\Vildmark.Core\Vildmark.Core.csproj" />
+		<ProjectReference Include="..\Vildmark\Vildmark.Graphics.Fonts\Vildmark.Graphics.Fonts.csproj" />
+		<ProjectReference Include="..\Vildmark\Vildmark.Graphics\Vildmark.Graphics.csproj" />
+		<ProjectReference Include="..\Vildmark\Vildmark.Maths\Vildmark.Maths.csproj" />
+		<ProjectReference Include="..\Vildmark\Vildmark.Qubicle\Vildmark.Qubicle.csproj" />
+		<ProjectReference Include="..\Vildmark\Vildmark.Tests\Vildmark.Tests.csproj" />
+		<ProjectReference Include="..\Vildmark\Vildmark.Windowing\Vildmark.Windowing.csproj" />
+		<ProjectReference Include="..\Vildmark\Vildmark\Vildmark.csproj" />
+	</ItemGroup>
+	
+	<Import Project="..\Vildmark\Vildmark.Graphics.Fonts\Vildmark.Graphics.Fonts.targets" />
 
 </Project>

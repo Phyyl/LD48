@@ -9,23 +9,29 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using Vildmark;
+using Vildmark.Graphics.Fonts;
 using Vildmark.Graphics.Rendering;
 using Vildmark.Maths;
 using Vildmark.Maths.Physics;
+using Vildmark.Resources;
 using Vildmark.Windowing;
 
 namespace LD48
 {
     public class Game : VildmarkGame<Game>
     {
+        public const float PixelScale = 4;
         private const float bounceAdjustSpeed = 0.1f;
 
         private static readonly Vector2 startPosition = new(100, -100);
 
         private RenderContext2D renderContext;
+        private RenderContext2D uiRenderContext;
         private Level level;
         private PlayerEntity player;
         private DragInfo drag;
+        private BitmapFont font;
+        private int score;
 
         protected override void InitializeWindowSettings(WindowSettings settings)
         {
@@ -36,7 +42,11 @@ namespace LD48
 
         public override void Load()
         {
+            Textures.Load();
+            font = ResourceLoader.LoadEmbedded<BitmapFont>("8bit.fnt");
+
             renderContext = RenderContext2D.Create();
+            uiRenderContext = RenderContext2D.Create();
             level = new();
 
             level.AddEntity(player = new PlayerEntity(startPosition, new(20, 20)));
@@ -45,14 +55,43 @@ namespace LD48
         public override void Resize(int width, int height)
         {
             renderContext.Resize(width, height);
+            uiRenderContext.Resize(width, height);
         }
 
         public override void Update(float delta)
         {
             level.Update(delta);
 
-            renderContext.Camera.Transform.Y = level.CameraOffset;
+            UpdateInput(delta);
+            UpdateAutoScroll(delta);
+            UpdatePowerups(delta);
 
+            if (player.CollisionBox.Intersects(ScreenAABB.Offset(new(0, Window.Height))))
+            {
+                Console.WriteLine("DEAD");
+            }
+        }
+
+        private void UpdatePowerups(float delta)
+        {
+            foreach (var entity in level.Entities.OfType<PowerupEntity>().ToArray())
+            {
+                if (entity.CollisionBox.Intersects(player.CollisionBox))
+                {
+                    level.RemoveEntity(entity);
+
+                    score += 100;
+                }
+            }
+        }
+
+        private void UpdateAutoScroll(float delta)
+        {
+            renderContext.Camera.Transform.Y = level.CameraOffset;
+        }
+
+        private void UpdateInput(float delta)
+        {
             if (Mouse.IsMousePressed(MouseButton.Left))
             {
                 drag = new(Mouse.Position, Mouse.Position);
@@ -91,6 +130,7 @@ namespace LD48
             {
                 player.Position = startPosition;
                 player.Velocity = new Vector2();
+                level.ResetCameraOffset();
             }
         }
 
@@ -101,10 +141,16 @@ namespace LD48
                 return;
             }
 
-            level.AddEntity(new PlatformEntity(dragAABB.Position, dragAABB.Size));
+            level.AddEntity(new PlatformEntity(dragAABB.Position, dragAABB.Size.X));
         }
 
         public override void Render(float delta)
+        {
+            RenderScene();
+            RenderUI();
+        }
+
+        private void RenderScene()
         {
             renderContext.Begin();
 
@@ -118,6 +164,15 @@ namespace LD48
             }
 
             renderContext.End();
+        }
+
+        private void RenderUI()
+        {
+            uiRenderContext.Begin(clear: false);
+            uiRenderContext.RenderText(font, $"Score: {score}", 25, Vector2.Zero, Color4.Black.ToVector());
+            uiRenderContext.RenderText(font, $"Position: {player.Position}", 25, new(0, 50), Color4.Black.ToVector());
+            uiRenderContext.RenderText(font, $"Velocity: {player.Velocity}", 25, new(0, 100), Color4.Black.ToVector());
+            uiRenderContext.End();
         }
 
         private IEnumerable<Entity> GetEntitiesAtScreenPosition(Vector2 position)
@@ -139,6 +194,8 @@ namespace LD48
 
             return new AABB2D(min + CameraOffset, size);
         }
+
+        private AABB2D ScreenAABB => new AABB2D(CameraOffset, Window.Size);
 
         private Vector2 CameraOffset => renderContext.Camera.Transform.Position.Xy;
 

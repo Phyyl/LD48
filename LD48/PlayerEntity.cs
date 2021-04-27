@@ -13,8 +13,9 @@ namespace LD48
 {
     public class PlayerEntity : Entity
     {
-        public float InputForce = 1000;
-        public float JumpForce = 1000;
+        public float InputForce = 2000;
+        public float JumpForce = 850;
+        public float MaxSpeed = 500;
 
         private IKeyboard keyboard;
 
@@ -31,22 +32,29 @@ namespace LD48
 
             if (keyboard.IsKeyDown(Keys.A))
             {
-                force.X -= InputForce;
+                force.X -= InputForce * delta;
             }
 
             if (keyboard.IsKeyDown(Keys.D))
             {
-                force.X += InputForce;
+                force.X += InputForce * delta;
+            }
+
+            if (keyboard.IsKeyDown(Keys.Space) && IsOnGround)
+            {
+                Velocity.Y -= JumpForce;
             }
 
             if (force.LengthSquared > 0)
             {
-                Velocity += force * delta;
+                if (Math.Abs(Velocity.X + force.X) < MaxSpeed)
+                {
+                    Velocity += force;
+                }
             }
-
-            if (keyboard.IsKeyPressed(Keys.Space) && IsOnGround)
+            else if (IsOnGround)
             {
-                Velocity.Y -= JumpForce;
+                Velocity.X -= Velocity.X * delta * 3;
             }
         }
     }
